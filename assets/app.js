@@ -96,6 +96,8 @@ function switchView(view) {
 
   if (window.innerWidth <= 768) {
     document.querySelector('.sidebar').classList.remove('open');
+    var ov = document.getElementById('sidebarOverlay');
+    if (ov) ov.classList.remove('show');
   }
 }
 
@@ -181,22 +183,57 @@ function renderItinerary(scheme) {
 function renderKnowledge() {
   var container = document.getElementById('knowledgeContainer');
   var html = '<h2>小红书搜索知识库</h2>';
-  html += '<p class="lead">所有推荐均标注来源笔记标题+作者，便于回溯原文。更新于2026-07-05。</p>';
+  html += '<p class="lead">所有推荐均标注来源笔记，点击可跳转原文。更新于2026-07-05。</p>';
 
   knowledgeSections.forEach(function(sec, i) {
     html += '<div class="know-section'+(i===0?' open':'')+'">';
     html += '<div class="know-head" onclick="this.parentElement.classList.toggle(\'open\')"><span>'+sec.title+'</span><span class="chev">▶</span></div>';
     html += '<div class="know-body">';
     sec.items.forEach(function(item) {
-      html += '<p style="margin-bottom:10px;padding-left:12px;border-left:3px solid #e6e8eb;"><b>'+item[0]+'</b><br>'+item[1]+'</p>';
+      html += '<div class="know-item">';
+      html += '<div class="know-item-title">'+item[0]+'</div>';
+      html += '<div class="know-item-desc">'+item[1]+'</div>';
+      if (item[2] && item[2].length > 0) {
+        html += '<div class="know-notes">';
+        item[2].forEach(function(noteKey) {
+          var note = xhsNotes[noteKey];
+          if (note) {
+            html += '<a href="'+note.url+'" target="_blank" rel="noopener" class="know-note-link" title="'+note.title+' - '+note.author+'">';
+            html += '<span class="know-note-title">'+note.title+'</span>';
+            html += '<span class="know-note-meta">'+note.author+' · '+note.likes+'赞</span>';
+            html += '</a>';
+          }
+        });
+        html += '</div>';
+      }
+      html += '</div>';
+    });
+    html += '</div></div>';
+  });
+
+  // 来源原文库
+  html += '<h2 style="margin-top:32px">来源原文库</h2>';
+  html += '<p class="lead">以下为本站引用的全部小红书笔记，按主题分类。点击标题可跳转原文。</p>';
+
+  xhsNoteGroups.forEach(function(group, gi) {
+    html += '<div class="know-section'+(gi===0?' open':'')+'">';
+    html += '<div class="know-head" onclick="this.parentElement.classList.toggle(\'open\')"><span>'+group.title+' ('+group.keys.length+')</span><span class="chev">▶</span></div>';
+    html += '<div class="know-body">';
+    group.keys.forEach(function(key) {
+      var note = xhsNotes[key];
+      if (note) {
+        html += '<div class="xhs-note-card">';
+        html += '<a href="'+note.url+'" target="_blank" rel="noopener" class="xhs-note-title">'+note.title+'</a>';
+        html += '<div class="xhs-note-author">'+note.author+' · '+note.likes+'赞</div>';
+        html += '<div class="xhs-note-summary">'+note.summary+'</div>';
+        html += '</div>';
+      }
     });
     html += '</div></div>';
   });
 
   container.innerHTML = html;
 }
-
-// ===== 待办清单渲染 =====
 function renderChecklist() {
   var container = document.getElementById('checklistContainer');
   var html = '<h2>行程前待办清单</h2>';
@@ -332,7 +369,10 @@ function renderSpots(scheme) {
 
 // ===== 侧边栏切换（移动端） =====
 function toggleSidebar() {
-  document.querySelector('.sidebar').classList.toggle('open');
+  var sb = document.querySelector('.sidebar');
+  var ov = document.getElementById('sidebarOverlay');
+  sb.classList.toggle('open');
+  if (ov) ov.classList.toggle('show', sb.classList.contains('open'));
 }
 
 // ===== 初始化 =====
