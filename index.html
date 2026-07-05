@@ -1,0 +1,86 @@
+﻿<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>云南蜜月旅行速查 · 滇西北反向环线8天版</title>
+<link rel="stylesheet" href="assets/leaflet/leaflet.css" />
+<link rel="stylesheet" href="assets/app.css" />
+</head>
+<body>
+<aside class="sidebar">
+  <div class="brand">
+    <div class="brand-title">云南蜜月旅行</div>
+    <div class="brand-sub">滇西北反向环线 · 8天版速查</div>
+  </div>
+  <nav class="nav">
+    <a href="#map" class="nav-item active" data-view="map"><span class="nav-ico">🗺</span>路线地图</a>
+    <a href="#itinerary" class="nav-item" data-view="itinerary"><span class="nav-ico">📅</span>逐日行程</a>
+    <a href="#knowledge" class="nav-item" data-view="knowledge"><span class="nav-ico">📚</span>知识库</a>
+    <a href="#checklist" class="nav-item" data-view="checklist"><span class="nav-ico">✅</span>待办清单</a>
+    <a href="#budget" class="nav-item" data-view="budget"><span class="nav-ico">💰</span>预算对比</a>
+    <a href="#spots" class="nav-item" data-view="spots"><span class="nav-ico">📍</span>景点清单</a>
+  </nav>
+  <div class="scheme-switch">
+    <div class="switch-label">行程方案</div>
+    <div class="switch-btns">
+      <button class="scheme-btn active" id="btnScheme1" onclick="switchScheme(1)">方案一·跳过梅里</button>
+      <button class="scheme-btn" id="btnScheme2" onclick="switchScheme(2)">方案二·德贡公路</button>
+    </div>
+    <div class="switch-hint" id="schemeHint">跳过梅里，香格里拉深度+腾冲芒市完整</div>
+  </div>
+  <div class="side-footer">
+    <div>更新于 2026-07-05</div>
+    <div>数据来源：高德地图 + 小红书笔记</div>
+  </div>
+</aside>
+
+<main class="main">
+  <header class="topbar">
+    <button class="menu-toggle" onclick="toggleSidebar()" aria-label="菜单">☰</button>
+    <div class="topbar-title" id="topbarTitle">路线地图</div>
+    <div class="topbar-meta" id="topbarMeta"></div>
+  </header>
+
+  <div class="content">
+
+    <section id="view-map" class="view active">
+      <div class="map-wrap">
+        <div id="map"></div>
+        <div class="map-legend">
+          <div><span class="lc lc-blue"></span>自驾主路</div>
+          <div><span class="lc lc-orange"></span>德贡公路+219怒江段</div>
+          <div><span class="lc lc-green"></span>必去景点</div>
+          <div><span class="lc lc-purple"></span>途经景点</div>
+        </div>
+      </div>
+    </section>
+
+    <section id="view-itinerary" class="view">
+      <div class="view-inner" id="itineraryContainer"></div>
+    </section>
+
+    <section id="view-knowledge" class="view">
+      <div class="view-inner" id="knowledgeContainer"></div>
+    </section>
+
+    <section id="view-checklist" class="view">
+      <div class="view-inner" id="checklistContainer"></div>
+    </section>
+
+    <section id="view-budget" class="view">
+      <div class="view-inner" id="budgetContainer"></div>
+    </section>
+
+    <section id="view-spots" class="view">
+      <div class="view-inner" id="spotsContainer"></div>
+    </section>
+
+  </div>
+</main>
+
+<script src="assets/leaflet/leaflet.js"></script>
+<script src="assets/data.js"></script>
+<script src="assets/app.js"></script>
+</body>
+</html>

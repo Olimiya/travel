@@ -1,0 +1,13 @@
+# 本地服务器日志
+server.log
+server-err.log
+*.log
+
+# 系统/编辑器
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# Node（即使现在用不到，留着防止误提交）
+node_modules/
