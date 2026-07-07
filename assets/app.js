@@ -31,16 +31,26 @@ function renderMapScheme(scheme) {
   var days = scheme === 1 ? days1 : days2;
   var colors = scheme === 1 ? colors1 : colors2;
 
-  var routeCoords = [];
-  days.forEach(function(d) {
-    if (d.coords2) { routeCoords.push(d.coords, d.coords2); }
-    else { routeCoords.push(d.coords); }
-  });
+var allCoords = [];
 
-  L.polyline(routeCoords, { color: scheme === 1 ? '#4A90D9' : '#00897B', weight: 4, opacity: 0.55 }).addTo(routeLayer);
-
-  if (scheme === 2) {
-    L.polyline([days2[3].coords2, days2[4].coords], { color: '#EA8A00', weight: 3, opacity: 0.4, dashArray: '8,6' }).addTo(routeLayer);
+  // 绘制真实道路轨迹（替代直线连接）
+  if (typeof routeTracks !== 'undefined' && routeTracks[scheme]) {
+    routeTracks[scheme].forEach(function(rt) {
+      if (rt.alt) {
+        L.polyline(rt.track, { color: rt.color, weight: 3, opacity: 0.45, dashArray: '8,6' }).addTo(routeLayer);
+      } else {
+        L.polyline(rt.track, { color: rt.color, weight: 4, opacity: 0.8 }).addTo(routeLayer);
+      }
+      rt.track.forEach(function(c) { allCoords.push(c); });
+    });
+  } else {
+    var routeCoords = [];
+    days.forEach(function(d) {
+      if (d.coords2) { routeCoords.push(d.coords, d.coords2); }
+      else { routeCoords.push(d.coords); }
+    });
+    L.polyline(routeCoords, { color: scheme === 1 ? '#4A90D9' : '#00897B', weight: 4, opacity: 0.55 }).addTo(routeLayer);
+    allCoords = routeCoords;
   }
 
   days.forEach(function(d) {
@@ -70,14 +80,24 @@ function renderMapScheme(scheme) {
     }
   });
 
-  if (scheme === 2) {
-    var njs = L.divIcon({ className:'', html: '<div style="background:#00897B;width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;font-size:10px;border:2px solid #fff;box-shadow:0 2px 4px rgba(0,0,0,0.3);">★</div>', iconSize:[24,24], iconAnchor:[12,12] });
-    L.marker([28.030,98.620], { icon: njs }).addTo(markerLayer).bindPopup('<b>怒江第一湾</b>【必去】<br>丙中洛日丹村<br>怒江Ω形大弯');
-    var syl = L.divIcon({ className:'', html: '<div style="background:#EA8A00;width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;font-size:10px;border:2px solid #fff;box-shadow:0 2px 4px rgba(0,0,0,0.3);">★</div>', iconSize:[24,24], iconAnchor:[12,12] });
-    L.marker([27.732,98.670], { icon: syl }).addTo(markerLayer).bindPopup('<b>石月亮景区</b>【备选】<br>福贡县219国道旁<br>怒江畔天然石洞');
+  // 绘制途经导航点（路线细化新增）
+  if (typeof routeWaypoints !== 'undefined') {
+    var wpColors = { scenic:'#E53935', nav:'#FF6F00', supply:'#43A047', pass:'#7E57C2' };
+    var wpIcons = { scenic:'景', nav:'导', supply:'油', pass:'隧' };
+    Object.keys(routeWaypoints).forEach(function(key) {
+      var wp = routeWaypoints[key];
+      var wpSchemes = Array.isArray(wp.scheme) ? wp.scheme : [wp.scheme];
+      if (wpSchemes.indexOf(scheme) < 0) return;
+      var bg = wpColors[wp.type] || '#666';
+      var label = wpIcons[wp.type] || '·';
+      var wicon = L.divIcon({ className:'', html: '<div style="background:'+bg+';width:20px;height:20px;border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;font-size:9px;font-weight:700;border:2px solid #fff;box-shadow:0 2px 4px rgba(0,0,0,0.3);">'+label+'</div>', iconSize:[20,20], iconAnchor:[10,10] });
+      L.marker(wp.coords, { icon: wicon }).addTo(markerLayer).bindPopup('<b>'+wp.name+'</b><br>'+wp.note);
+      var wlabel = L.divIcon({ className:'', html: '<div class="marker-label" style="margin-left:14px;margin-top:-4px;font-size:10px;">'+wp.name+'</div>', iconSize:[0,0] });
+      L.marker(wp.coords, { icon: wlabel, interactive: false, zIndexOffset: -100 }).addTo(markerLayer);
+    });
   }
 
-  map.fitBounds(routeCoords, { padding: [50, 50] });
+  map.fitBounds(allCoords.length ? allCoords : [[26.5,100.0]], { padding: [50, 50] });
 }
 
 // ===== 视图切换 =====
