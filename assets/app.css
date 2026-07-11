@@ -656,3 +656,124 @@ tr:hover td { background: #fafbfc; }
   .day-card-drive { display: none; }
   .spot-grid { grid-template-columns: 1fr; }
 }
+
+/* 备选支线库 */
+.detour-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  margin-bottom: 12px;
+  overflow: hidden;
+}
+.detour-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 16px;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.detour-head:hover { background: var(--primary-light); }
+.detour-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text);
+}
+.detour-date {
+  font-size: 11px;
+  color: var(--accent);
+  margin-top: 2px;
+}
+.detour-card .chev {
+  color: var(--text-3);
+  transition: transform 0.2s;
+  font-size: 12px;
+}
+.detour-card.open .chev { transform: rotate(90deg); }
+.detour-body {
+  padding: 0 16px 14px;
+  display: none;
+}
+.detour-card.open .detour-body { display: block; }
+
+.detour-tree {
+  background: #f8fafc;
+  border-radius: 6px;
+  padding: 12px 14px;
+  margin-bottom: 10px;
+}
+.tree-node {
+  margin-bottom: 8px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid #e6e8eb;
+}
+.tree-node:last-child {
+  margin-bottom: 0;
+  padding-bottom: 0;
+  border-bottom: none;
+}
+.tree-q {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--primary);
+  margin-bottom: 3px;
+}
+.tree-q::before {
+  content: '? ';
+  color: var(--accent);
+}
+.tree-a {
+  font-size: 13px;
+  color: var(--text-2);
+  padding-left: 16px;
+  line-height: 1.7;
+}
+.tree-a::before {
+  content: '-> ';
+  color: var(--green);
+  font-weight: 700;
+}
+.detour-srcs {
+  font-size: 11px;
+  color: var(--text-3);
+  line-height: 1.6;
+  margin-top: 6px;
+}
+.detour-srcs b { color: var(--text-2); }
+
+/* 沙溪古镇卡片 */
+.shaxi-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 16px;
+  margin-bottom: 16px;
+}
+.shaxi-meta {
+  margin: 8px 0 12px;
+  font-size: 13px;
+  color: var(--text-2);
+}
+.shaxi-route {
+  background: #f8fafc;
+  border-radius: 6px;
+  padding: 10px 14px;
+  font-size: 13px;
+  color: var(--text-2);
+  line-height: 1.8;
+  margin-bottom: 10px;
+}
+.shaxi-card h4 {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text);
+  margin: 14px 0 8px;
+}
+
+/* 备选支线库 h4 */
+.view-inner h4 {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text);
+  margin: 16px 0 8px;
+}

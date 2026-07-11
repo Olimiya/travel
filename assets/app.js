@@ -107,7 +107,7 @@ function switchView(view) {
   document.querySelectorAll('.nav-item').forEach(function(n) { n.classList.remove('active'); });
   document.querySelector('.nav-item[data-view="'+view+'"]').classList.add('active');
 
-  var titles = { map:'路线地图', itinerary:'逐日行程', knowledge:'知识库', checklist:'待办清单', budget:'预算对比', spots:'景点清单' };
+  var titles = { map:'路线地图', itinerary:'逐日行程', knowledge:'知识库', checklist:'待办清单', budget:'预算对比', spots:'景点清单', backup:'备选支线' };
   document.getElementById('topbarTitle').textContent = titles[view] || '';
 
   if (view === 'map' && map) {
@@ -411,5 +411,130 @@ document.addEventListener('DOMContentLoaded', function() {
   renderChecklist();
   renderBudget(1);
   renderSpots(1);
+  renderBackup();
   updateTopbarMeta(1);
 });
+
+// ===== 备选方案与支线库渲染 =====
+function renderBackup() {
+  var container = document.getElementById('backupContainer');
+  var html = '<h2>备选方案与支线库</h2>';
+  html += '<p class="lead">独立于主方案，不干扰主方案节奏。提供丰富的备选景点候选库、分叉支线、应急方案，供不同情况人工决策切换。更新于2026-07-11。</p>';
+
+  // 触发场景总览
+  html += '<h3>备选触发场景总览</h3>';
+  html += '<div class="tbl-wrap"><table><thead><tr><th>场景</th><th>触发条件</th><th>影响范围</th><th>切换方向</th></tr></thead><tbody>';
+  backupScenarios.forEach(function(s) {
+    var dirClass = s.id === 'A' ? 'tag-warn' : (s.id === 'I' ? 'tag-opt' : 'tag-must');
+    html += '<tr><td><b>'+s.id+'. '+s.trigger+'</b></td><td>'+s.condition+'</td><td>'+s.scope+'</td><td><span class="tag '+dirClass+'">'+s.direction+'</span></td></tr>';
+  });
+  html += '</tbody></table></div>';
+
+  // 备选景点候选库
+  html += '<h3>备选景点候选库</h3>';
+  html += '<p class="lead">按城市分层：主方案已含 -> 备选替换 -> 雨天适用 -> 小众补充。</p>';
+  backupCitySpots.forEach(function(city) {
+    html += '<div class="know-section">';
+    html += '<div class="know-head" onclick="this.parentElement.classList.toggle(\'open\')"><span>'+city.city+' ('+city.spots.length+')</span><span class="chev">▶</span></div>';
+    html += '<div class="know-body">';
+    html += '<div class="tbl-wrap"><table><thead><tr><th>景点</th><th>类型</th><th>门票</th><th>特色</th><th>雨天</th><th>来源</th></tr></thead><tbody>';
+    city.spots.forEach(function(s) {
+      var rainTag = s.rain === '是' ? '<span class="tag tag-must">是</span>' : (s.rain === '否' ? '<span class="tag tag-warn">否</span>' : '<span class="tag tag-opt">一般</span>');
+      html += '<tr><td><b>'+s.name+'</b></td><td>'+s.type+'</td><td>'+s.ticket+'</td><td>'+s.feature+'</td><td>'+rainTag+'</td><td style="font-size:11px;color:var(--text-3)">'+s.src+'</td></tr>';
+    });
+    html += '</tbody></table></div>';
+    html += '</div></div>';
+  });
+
+  // 道路封路绕行决策树
+  html += '<h3>道路封路绕行决策树</h3>';
+  html += '<p class="lead">2026年7月雨季，滇西北多条道路有封路/塌方真实案例。以下为每个关键路段的绕行方案。</p>';
+  backupDetours.forEach(function(d) {
+    html += '<div class="detour-card">';
+    html += '<div class="detour-head" onclick="this.parentElement.classList.toggle(\'open\')">';
+    html += '<div><div class="detour-title">'+d.title+'</div>';
+    html += '<div class="detour-date">'+d.date+'</div></div>';
+    html += '<span class="chev">▶</span></div>';
+    html += '<div class="detour-body">';
+    html += '<div class="detour-tree">';
+    d.tree.forEach(function(t) {
+      html += '<div class="tree-node">';
+      html += '<div class="tree-q">'+t.q+'</div>';
+      html += '<div class="tree-a">'+t.a+'</div>';
+      html += '</div>';
+    });
+    html += '</div>';
+    if (d.note) html += '<div class="note">'+d.note+'</div>';
+    html += '<div class="detour-srcs"><b>信源：</b> '+d.srcs.join('；')+'</div>';
+    html += '</div></div>';
+  });
+
+  // 高反应对方案
+  html += '<h3>高反应对方案与低海拔备选路线</h3>';
+  html += '<p class="lead">7月滇西北行程涉及海拔2400m->3300m->3400m->4292m。高反风险真实存在。</p>';
+  html += '<h4>预防与监测</h4>';
+  html += '<div class="spot-grid">';
+  backupAltitude.prevention.forEach(function(p) {
+    html += '<div class="spot-card"><span class="spot-name">'+p.item+'</span><div class="spot-note">'+p.desc+'</div></div>';
+  });
+  html += '</div>';
+  html += '<h4>三级降级路线</h4>';
+  html += '<div class="tbl-wrap"><table><thead><tr><th>级别</th><th>海拔</th><th>行动</th></tr></thead><tbody>';
+  backupAltitude.routes.forEach(function(r) {
+    html += '<tr><td><b>'+r.level+'</b></td><td>'+r.altitude+'</td><td>'+r.action+'</td></tr>';
+  });
+  html += '</tbody></table></div>';
+
+  // 雨季天气判断工具
+  html += '<h3>雨季天气判断工具</h3>';
+  html += '<p class="lead">7月滇西北雨季，但并非整天大雨。掌握判断方法可大幅减少"看预报全是雨"的焦虑。</p>';
+  html += '<h4>假雨判断法</h4>';
+  html += '<div class="tbl-wrap"><table><thead><tr><th>条件</th><th>判断</th></tr></thead><tbody>';
+  backupWeather.rules.forEach(function(r) {
+    html += '<tr><td><b>'+r.condition+'</b></td><td>'+r.action+'</td></tr>';
+  });
+  html += '</tbody></table></div>';
+  html += '<h4>各城市雨天模式</h4>';
+  html += '<div class="spot-grid">';
+  backupWeather.rainyMode.forEach(function(r) {
+    html += '<div class="spot-card"><span class="spot-name">'+r.city+'</span><div class="spot-note">'+r.spots+'</div></div>';
+  });
+  html += '</div>';
+
+  // 途经景点扩展库
+  html += '<h3>途经景点扩展库</h3>';
+  html += '<p class="lead">主方案各驾驶路段沿途可停留的景点，供灵活增减。</p>';
+  backupTransit.forEach(function(route) {
+    html += '<div class="know-section">';
+    html += '<div class="know-head" onclick="this.parentElement.classList.toggle(\'open\')"><span>'+route.route+'</span><span class="chev">▶</span></div>';
+    html += '<div class="know-body">';
+    html += '<div class="tbl-wrap"><table><thead><tr><th>途经景点</th><th>停留</th><th>特色</th></tr></thead><tbody>';
+    route.spots.forEach(function(s) {
+      html += '<tr><td><b>'+s.name+'</b></td><td>'+s.stop+'</td><td>'+s.feature+'</td></tr>';
+    });
+    html += '</tbody></table></div>';
+    html += '</div></div>';
+  });
+
+  // 沙溪古镇支线
+  html += '<h3>沙溪古镇支线</h3>';
+  html += '<div class="shaxi-card">';
+  html += '<p>'+backupShaxi.overview+'</p>';
+  html += '<div class="shaxi-meta"><span class="tag tag-must">免费</span> 海拔'+backupShaxi.altitude+' | 交通：'+backupShaxi.transport+'</div>';
+  html += '<h4>游览路线</h4>';
+  html += '<div class="shaxi-route">'+backupShaxi.route.join(' -> ')+'</div>';
+  html += '<h4>美食推荐</h4>';
+  html += '<div class="spot-grid">';
+  backupShaxi.foods.forEach(function(f) {
+    var tagClass = f.rating === '5星' ? 'tag-must' : 'tag-opt';
+    html += '<div class="spot-card"><span class="tag '+tagClass+'">'+f.rating+'</span> <span class="spot-name">'+f.name+'</span><div class="spot-note">'+f.desc+'</div></div>';
+  });
+  html += '</div>';
+  html += '<h4>触发条件</h4>';
+  html += '<p>'+backupShaxi.trigger+'</p>';
+  html += '<h4>使用方式</h4>';
+  html += '<div class="note">'+backupShaxi.usage+'</div>';
+  html += '</div>';
+
+  container.innerHTML = html;
+}
