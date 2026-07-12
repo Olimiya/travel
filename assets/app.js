@@ -107,7 +107,7 @@ function switchView(view) {
   document.querySelectorAll('.nav-item').forEach(function(n) { n.classList.remove('active'); });
   document.querySelector('.nav-item[data-view="'+view+'"]').classList.add('active');
 
-  var titles = { map:'路线地图', itinerary:'逐日行程', knowledge:'知识库', checklist:'待办清单', budget:'预算对比', spots:'景点清单', backup:'备选支线' };
+  var titles = { map:'路线地图', itinerary:'逐日行程', knowledge:'知识库', general:'通用知识', checklist:'待办清单', budget:'预算对比', spots:'景点清单', backup:'备选支线' };
   document.getElementById('topbarTitle').textContent = titles[view] || '';
 
   if (view === 'map' && map) {
@@ -248,6 +248,28 @@ function renderKnowledge() {
         html += '<div class="xhs-note-summary">'+note.summary+'</div>';
         html += '</div>';
       }
+    });
+    html += '</div></div>';
+  });
+
+  container.innerHTML = html;
+}
+
+// ===== 通用知识库渲染 =====
+function renderGeneralKnowledge() {
+  var container = document.getElementById('generalContainer');
+  var html = '<h2>通用旅行知识库</h2>';
+  html += '<p class="lead">航班、高铁、自驾、高原、雨季、安全等通用旅行知识，独立于具体行程，可迁移复用。</p>';
+
+  generalKnowledge.forEach(function(sec, i) {
+    html += '<div class="know-section'+(i===0?' open':'')+'">';
+    html += '<div class="know-head" onclick="this.parentElement.classList.toggle(\'open\')"><span>'+sec.title+'</span><span class="chev">▶</span></div>';
+    html += '<div class="know-body">';
+    sec.items.forEach(function(item) {
+      html += '<div class="know-item">';
+      html += '<div class="know-item-title">'+item.q+'</div>';
+      html += '<div class="know-item-desc">'+item.a+'</div>';
+      html += '</div>';
     });
     html += '</div></div>';
   });
@@ -408,6 +430,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
   renderItinerary(1);
   renderKnowledge();
+  renderGeneralKnowledge();
   renderChecklist();
   renderBudget(1);
   renderSpots(1);
