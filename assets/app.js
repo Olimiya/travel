@@ -140,7 +140,7 @@ function updateTopbarMeta(scheme) {
   if (scheme === 1) {
     meta.textContent = '方案一 · 最长D5 4.6h · 约14700-16200';
   } else {
-    meta.textContent = '方案二 · 最长D5 5.0h · 约14800-16400';
+    meta.textContent = '方案二 · 最长D5 5.5-6.5h(限速40) · 约14800-16400';
   }
 }
 
